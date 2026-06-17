@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeGuard AI - Intelligent Code Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-color: #475569;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--primary-color)20, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 2rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Code Editor Section */
+        .editor-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+        }
+
+        .code-editor {
+            position: relative;
+        }
+
+        .code-textarea {
+            width: 100%;
+            height: 300px;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            resize: vertical;
+            transition: all 0.2s ease;
+        }
+
+        .code-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+        }
+
+        .code-editor-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .line-numbers {
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Examples Section */
+        .examples {
+            margin-bottom: 1.5rem;
+        }
+
+        .example-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        .example-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .feature-list li i {
+            color: var(--success-color);
+            width: 16px;
+        }
+
+        /* Results Section */
+        .results {
+            margin-top: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .results-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .results-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Issues */
+        .issues-section {
+            margin-top: 1.5rem;
+        }
+
+        .issue-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .issue-tab {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .issue-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .issue-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .issue {
+            background: var(--bg-primary);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid;
+            transition: all 0.2s ease;
+        }
+
+        .issue:hover {
+            transform: translateX(4px);
+        }
+
+        .issue.error {
+            border-left-color: var(--error-color);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .issue.warning {
+            border-left-color: var(--warning-color);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .issue.suggestion {
+            border-left-color: var(--info-color);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .issue-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .issue-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .issue-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .issue-message {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .issue-suggestion {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
+
+        .no-issues {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .no-issues i {
+            font-size: 3rem;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.75rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .logo-text {
+                font-size: 2rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1 class="logo-text">CodeGuard AI</h1>
+            </div>
+            <p class="subtitle">Intelligent Code Analysis with Machine Learning</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Languages</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">&lt;2s</div>
+                    <div class="stat-label">Analysis Time</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Editor Section -->
+            <div class="editor-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h2 class="section-title">Code Analysis</h2>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="language">
+                            <i class="fas fa-cog"></i> Programming Language
+                        </label>
+                        <select id="language">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="go">Go</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filename">
+                            <i class="fas fa-file"></i> File Path
+                        </label>
+                        <input type="text" id="filename" placeholder="e.g., src/main.py">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="code-editor-header">
+                        <label for="code">
+                            <i class="fas fa-terminal"></i> Source Code
+                        </label>
+                    </div>
+                    <div class="code-editor">
+                        <textarea id="code" class="code-textarea" placeholder="Paste your code here for analysis..."></textarea>
+                    </div>
+                </div>
+
+                <div class="examples">
+                    <label>
+                        <i class="fas fa-lightbulb"></i> Quick Examples
+                    </label>
+                    <div class="example-buttons">
+                        <button class="example-btn" onclick="loadExample('python')">
+                            <i class="fab fa-python"></i> Python
+                        </button>
+                        <button class="example-btn" onclick="loadExample('javascript')">
+                            <i class="fab fa-js"></i> JavaScript
+                        </button>
+                        <button class="example-btn" onclick="loadExample('java')">
+                            <i class="fab fa-java"></i> Java
+                        </button>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="analyzeCode()" id="analyzeBtn">
+                        <i class="fas fa-search"></i>
+                        Analyze Code
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearResults()">
+                        <i class="fas fa-trash"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="info-card">
+                    <h3>
+                        <i class="fas fa-robot"></i>
+                        AI-Powered Analysis
+                    </h3>
+                    <p>Our advanced machine learning models analyze your code for potential bugs, security vulnerabilities, and quality issues.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Syntax Error Detection</li>
+                        <li><i class="fas fa-check"></i> Security Vulnerability Scanning</li>
+                        <li><i class="fas fa-check"></i> Code Quality Metrics</li>
+                        <li><i class="fas fa-check"></i> Best Practice Suggestions</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>
+                        <i class="fas fa-chart-line"></i>
+                        Performance Metrics
+                    </h3>
+                    <p>Get detailed insights into your code's complexity, maintainability, and overall quality score.</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>
+                        <i class="fas fa-shield-alt"></i>
+                        Security First
+                    </h3>
+                    <p>Your code is analyzed in real-time without storage. We prioritize your privacy and security.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="results" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        
+        const examples = {
+            python: `def calculate_factorial(n):
+    """Calculate factorial with potential issues"""
+    if n < 0:
+        return None
+    elif n == 0:
+        return 1
+    else:
+        result = 1
+        for i in range(1, n + 1):
+            result *= i
+        return result
+
+def divide_numbers(a, b):
+    # This function has security issues
+    try:
+        return a / b
+    except:  # Bare except - bad practice
+        pass
+
+# Missing error handling
+def process_data(data):
+    for item in data:
+        print(item)  # Should use logging
+        if item == "special":
+            break
+    return len(data)`,
+            
+            javascript: `// JavaScript code with common issues
+function calculateSum(arr) {
+    var total = 0;  // Should use let/const
+    
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == null) {  // Should use strict equality
+            continue;
+        }
+        total += arr[i];
+    }
+    
+    console.log("Sum calculated: " + total);  // Remove in production
+    return total;
+}
+
+// Missing error handling and validation
+function divideNumbers(a, b) {
+    return a / b;  // No zero division check
+}
+
+// Potential security issue
+function processUserInput(input) {
+    eval(input);  // Never use eval with user input
+}`,
+            
+            java: `public class Calculator {
+    public static void main(String[] args) {
+        System.out.println("Calculator started");  // Use logging framework
+        
+        try {
+            int result = divide(10, 0);
+            System.out.println("Result: " + result);
+        } catch (Exception e) {
+            // Empty catch block - bad practice
+        }
+    }
+    
+    // Missing input validation
+    public static int divide(int a, int b) {
+        return a / b;  // Potential division by zero
+    }
+    
+    // Security vulnerability
+    public static void processCommand(String cmd) {
+        Runtime.getRuntime().exec(cmd);  // Command injection risk
+    }
+}`
+        };
+        
+        let currentTab = 'all';
+        let analysisResults = null;
+        
+        function loadExample(language) {
+            document.getElementById('language').value = language;
+            document.getElementById('code').value = examples[language];
+            document.getElementById('filename').value = `example.${language === 'javascript' ? 'js' : language}`;
+        }
+        
+        async function analyzeCode() {
+            const code = document.getElementById('code').value.trim();
+            const language = document.getElementById('language').value;
+            const filename = document.getElementById('filename').value || 'unknown';
+            
+            if (!code) {
+                showNotification('Please enter some code to analyze', 'warning');
+                return;
+            }
+            
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const resultsDiv = document.getElementById('results');
+            
+            // Update button state
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<div class="spinner"></div> Analyzing...';
+            
+            // Show loading state
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <span>Analyzing your code with AI...</span>
+                </div>
+            `;
+            resultsDiv.classList.add('fade-in');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        language: language,
+                        file_path: filename
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Analysis failed: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                analysisResults = result;
+                displayResults(result);
+                
+            } catch (error) {
+                console.error('Analysis error:', error);
+                resultsDiv.innerHTML = `
+                    <div class="results-header">
+                        <div class="results-title">
+                            <i class="fas fa-exclamation-triangle" style="color: var(--error-color);"></i>
+                            Analysis Error
+                        </div>
+                    </div>
+                    <div class="issue error">
+                        <div class="issue-message">
+                            <strong>Error:</strong> ${error.message}
+                        </div>
+                        <div class="issue-suggestion">
+                            Please check your network connection and try again.
+                        </div>
+                    </div>
+                `;
+            } finally {
+                // Reset button state
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-search"></i> Analyze Code';
+            }
+        }
+        
+        function displayResults(result) {
+            const resultsDiv = document.getElementById('results');
+            
+            const allIssues = [
+                ...result.errors.map(issue => ({...issue, category: 'error'})),
+                ...result.warnings.map(issue => ({...issue, category: 'warning'})),
+                ...result.suggestions.map(issue => ({...issue, category: 'suggestion'}))
+            ];
+            
+            let html = `
+                <div class="results-header">
+                    <div class="results-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Analysis Results
+                    </div>
+                    <div class="results-meta">
+                        <span><i class="fas fa-file"></i> ${result.file_path}</span>
+                        <span><i class="fas fa-code"></i> ${result.language}</span>
+                        <span><i class="fas fa-clock"></i> ${result.analysis_time.toFixed(3)}s</span>
+                    </div>
+                </div>
+            `;
+            
+            // Metrics Grid
+            if (result.metrics && Object.keys(result.metrics).length > 0) {
+                html += '<div class="metrics-grid">';
+                Object.entries(result.metrics).forEach(([key, value]) => {
+                    const displayValue = typeof value === 'number' ? 
+                        (value % 1 === 0 ? value : value.toFixed(2)) : value;
+                    const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    
+                    html += `
+                        <div class="metric-card">
+                            <div class="metric-value">${displayValue}</div>
+                            <div class="metric-label">${label}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            
+            // Issue Tabs
+            const errorCount = result.errors.length;
+            const warningCount = result.warnings.length;
+            const suggestionCount = result.suggestions.length;
+            const totalCount = errorCount + warningCount + suggestionCount;
+            
+            html += `
+                <div class="issues-section">
+                    <div class="issue-tabs">
+                        <button class="issue-tab ${currentTab === 'all' ? 'active' : ''}" onclick="switchTab('all')">
+                            <i class="fas fa-list"></i>
+                            All Issues
+                            <span class="issue-count">${totalCount}</span>
+                        </button>
+                        <button class="issue-tab ${currentTab === 'error' ? 'active' : ''}" onclick="switchTab('error')">
+                            <i class="fas fa-times-circle"></i>
+                            Errors
+                            <span class="issue-count">${errorCount}</span>
+                        </button>
+                        <button class="issue-tab ${currentTab === 'warning' ? 'active' : ''}" onclick="switchTab('warning')">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Warnings
+                            <span class="issue-count">${warningCount}</span>
+                        </button>
+                        <button class="issue-tab ${currentTab === 'suggestion' ? 'active' : ''}" onclick="switchTab('suggestion')">
+                            <i class="fas fa-lightbulb"></i>
+                            Suggestions
+                            <span class="issue-count">${suggestionCount}</span>
+                        </button>
+                    </div>
+                    <div id="issues-content">
+            `;
+            
+            html += renderIssues(allIssues, currentTab);
+            html += '</div></div>';
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function renderIssues(allIssues, tab) {
+            let filteredIssues = allIssues;
+            if (tab !== 'all') {
+                filteredIssues = allIssues.filter(issue => issue.category === tab);
+            }
+            
+            if (filteredIssues.length === 0) {
+                return `
+                    <div class="no-issues">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>No ${tab === 'all' ? '' : tab} issues found!</h3>
+                        <p>Your code looks good for this category.</p>
+                    </div>
+                `;
+            }
+            
+            let html = '';
+            filteredIssues.forEach((issue, index) => {
+                const icon = {
+                    error: 'fas fa-times-circle',
+                    warning: 'fas fa-exclamation-triangle',
+                    suggestion: 'fas fa-lightbulb'
+                }[issue.category];
+                
+                html += `
+                    <div class="issue ${issue.category} slide-in" style="animation-delay: ${index * 0.1}s">
+                        <div class="issue-header">
+                            <div class="issue-type">
+                                <i class="${icon}"></i>
+                                ${issue.category.toUpperCase()}
+                            </div>
+                            <div class="issue-meta">
+                                Line ${issue.line}:${issue.column} | ${issue.rule} | ${Math.round(issue.confidence * 100)}%
+                            </div>
+                        </div>
+                        <div class="issue-message">${issue.message}</div>
+                        ${issue.suggestion ? `<div class="issue-suggestion"><i class="fas fa-lightbulb"></i> ${issue.suggestion}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            if (analysisResults) {
+                const allIssues = [
+                    ...analysisResults.errors.map(issue => ({...issue, category: 'error'})),
+                    ...analysisResults.warnings.map(issue => ({...issue, category: 'warning'})),
+                    ...analysisResults.suggestions.map(issue => ({...issue, category: 'suggestion'}))
+                ];
+                
+                // Update tab states
+                document.querySelectorAll('.issue-tab').forEach(tabBtn => {
+                    tabBtn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                // Update content
+                document.getElementById('issues-content').innerHTML = renderIssues(allIssues, tab);
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('code').value = '';
+            document.getElementById('filename').value = '';
+            document.getElementById('results').style.display = 'none';
+            analysisResults = null;
+            currentTab = 'all';
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Simple notification system
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: var(--${type === 'warning' ? 'warning' : 'info'}-color);
+                color: white;
+                border-radius: 8px;
+                box-shadow: var(--shadow-lg);
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Load Python example by default
+        loadExample('python');
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                analyzeCode();
+            }
+        });
+    </script>
+</body>
+</html>
